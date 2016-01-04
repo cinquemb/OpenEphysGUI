@@ -97,6 +97,7 @@ private:
 
     SelectorButton* windowSelector;
     SelectorButton* tabSelector;
+    SelectorButton* feedbackSelector;
 
     int tabIndex;
 

@@ -33,8 +33,10 @@ SelectorButton::SelectorButton(const String& name_)
 
     if (getName().equalsIgnoreCase("window"))
         setTooltip("Open this visualizer in its own window");
-    else
+    else if (getName().equalsIgnoreCase("tab"))
         setTooltip("Open this visualizer in a tab");
+    else if (getName().equalsIgnoreCase("feedback"))
+        setTooltip("Open neural feedback visualizer in a tab");
 
 }
 
@@ -59,12 +61,18 @@ void SelectorButton::paintButton(Graphics& g, bool isMouseOver, bool isButtonDow
         g.drawRect(0,0,getWidth(),getHeight(),1.0);
         g.fillRect(0,0,getWidth(),3.0);
     }
-    else
+    else if (getName().equalsIgnoreCase("tab"))
     {
         // tab icon
         g.drawVerticalLine(5,0,getHeight());
         g.fillRoundedRectangle(5,2,4,getHeight()-4,4.0f);
         g.fillRect(5,2,4,getHeight()-4);
+    }
+    else if (getName().equalsIgnoreCase("feedback"))
+    {
+        //feedback icon
+        g.drawEllipse(5,2,4,getHeight()-4,2); 
+        g.fillEllipse(5,2,4,getHeight()-4);
     }
 
 }
@@ -76,7 +84,6 @@ VisualizerEditor::VisualizerEditor(GenericProcessor* parentNode, int width, bool
 {
 
     desiredWidth = width;
-
     initializeSelectors();
 }
 
@@ -86,7 +93,7 @@ VisualizerEditor::VisualizerEditor(GenericProcessor* parentNode, bool useDefault
       dataWindow(nullptr), canvas(nullptr), isPlaying(false), tabIndex(-1)
 {
 
-    desiredWidth = 180;
+    desiredWidth = 200;
     initializeSelectors();
 
 }
@@ -96,17 +103,24 @@ void VisualizerEditor::initializeSelectors()
 
     windowSelector = new SelectorButton("window");
     windowSelector->addListener(this);
-    windowSelector->setBounds(desiredWidth - 40,7,14,10);
+    windowSelector->setBounds(desiredWidth - 60,7,14,10);
 
     windowSelector->setToggleState(false, dontSendNotification);
     addAndMakeVisible(windowSelector);
 
     tabSelector = new SelectorButton("tab");
     tabSelector->addListener(this);
-    tabSelector->setBounds(desiredWidth - 20,7,15,10);
+    tabSelector->setBounds(desiredWidth - 40,7,15,10);
 
     addAndMakeVisible(tabSelector);
     tabSelector->setToggleState(false, dontSendNotification);
+
+    feedbackSelector = new SelectorButton("feedback");
+    feedbackSelector->addListener(this);
+    feedbackSelector->setBounds(desiredWidth - 20,7,16,10);
+
+    addAndMakeVisible(feedbackSelector);
+    feedbackSelector->setToggleState(false, dontSendNotification);
 }
 
 VisualizerEditor::~VisualizerEditor()
@@ -188,10 +202,12 @@ void VisualizerEditor::buttonEvent(Button* button)
         if (button == windowSelector)
         {
 
-            if (tabSelector->getToggleState() && windowSelector->getToggleState())
+            if (tabSelector->getToggleState() && windowSelector->getToggleState() && feedbackSelector->getToggleState())
             {
                 tabSelector->setToggleState(false, dontSendNotification);
-				AccessClass::getDataViewport()->destroyTab(tabIndex);
+                feedbackSelector->setToggleState(false, dontSendNotification);
+
+                AccessClass::getDataViewport()->destroyTab(tabIndex);
                 tabIndex = -1;
             }
 
@@ -235,6 +251,12 @@ void VisualizerEditor::buttonEvent(Button* button)
                     dataWindow->setVisible(false);
                 }
 
+                if (feedbackSelector->getToggleState())
+                {
+                    feedbackSelector->setToggleState(false, dontSendNotification);
+                    AccessClass::getDataViewport()->destroyTab(tabIndex);
+                }
+
 				tabIndex = AccessClass::getDataViewport()->addTabToDataViewport(tabText, canvas, this);
 
 
@@ -242,6 +264,35 @@ void VisualizerEditor::buttonEvent(Button* button)
             else if (!tabSelector->getToggleState() && tabIndex > -1)
             {
 				AccessClass::getDataViewport()->destroyTab(tabIndex);
+                tabIndex = -1;
+
+            }
+        }
+        else if (button == feedbackSelector)
+        {
+            if (feedbackSelector->getToggleState() && tabIndex < 0)
+            {
+
+                if (windowSelector->getToggleState())
+                {
+                    dataWindow->setContentNonOwned(0, false);
+                    windowSelector->setToggleState(false, dontSendNotification);                    
+                    dataWindow->setVisible(false);
+                }
+
+                if (tabSelector->getToggleState())
+                {
+                    tabSelector->setToggleState(false, dontSendNotification);
+                    AccessClass::getDataViewport()->destroyTab(tabIndex);
+                }
+
+                tabIndex = AccessClass::getDataViewport()->addTabToDataViewport(tabText, canvas, this);
+
+
+            }
+            else if (!feedbackSelector->getToggleState() && tabIndex > -1)
+            {
+                AccessClass::getDataViewport()->destroyTab(tabIndex);
                 tabIndex = -1;
 
             }
@@ -254,8 +305,9 @@ void VisualizerEditor::buttonEvent(Button* button)
     if (button == drawerButton)
     {
         std::cout<<"Drawer button clicked"<<std::endl;
-        windowSelector->setBounds(desiredWidth - 40,7,14,10);
-        tabSelector->setBounds(desiredWidth - 20,7,15,10);
+        windowSelector->setBounds(desiredWidth - 60,7,14,10);
+        tabSelector->setBounds(desiredWidth - 40,7,15,10);
+        feedbackSelector->setBounds(desiredWidth - 20,7,16,10);
 
     }
 
@@ -265,6 +317,9 @@ void VisualizerEditor::saveCustomParameters(XmlElement* xml)
 {
 
     xml->setAttribute("Type", "Visualizer");
+
+    XmlElement* feedbackButtonState = xml->createNewChildElement("FEEDBACK");
+    feedbackButtonState->setAttribute("Active",feedbackSelector->getToggleState());
 
     XmlElement* tabButtonState = xml->createNewChildElement("TAB");
     tabButtonState->setAttribute("Active",tabSelector->getToggleState());
@@ -301,6 +356,12 @@ void VisualizerEditor::loadCustomParameters(XmlElement* xml)
                 tabSelector->setToggleState(true, sendNotification);
 
 
+        }else if (xmlNode->hasTagName("FEEDBACK"))
+        {
+            bool feedbackState = xmlNode->getBoolAttribute("Active");
+
+            if (feedbackState)
+                feedbackSelector->setToggleState(true, sendNotification);
         }
         else if (xmlNode->hasTagName("WINDOW"))
         {

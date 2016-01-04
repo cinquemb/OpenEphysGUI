@@ -31,7 +31,7 @@ LfpDisplayEditor::LfpDisplayEditor(GenericProcessor* parentNode, bool useDefault
 
     tabText = "LFP";
 
-    desiredWidth = 180;
+    desiredWidth = 200;
 
 }
 
