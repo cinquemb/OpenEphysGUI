@@ -1637,7 +1637,6 @@
 				301592EBAC0FFF6F5B268E99 /* background_tile.png */,
 				41105E536155E394E54BDD35 /* colourscheme_dark.xml */,
 				5F6584B675E30761521A9F42 /* colourscheme_light.xml */,
-				B483D960309FAFC193F9CDA2 /* juce_icon.png */,
 				0075C5208947159AF2802F3B /* jucer_AudioPluginEditorTemplate.cpp */,
 				AFF72BA2B130F3F9AC029080 /* jucer_AudioPluginEditorTemplate.h */,
 				65F4749184C84C2FDBB4C305 /* jucer_AudioPluginFilterTemplate.cpp */,
@@ -2609,7 +2608,7 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-Wall",
@@ -2671,6 +2670,7 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-Wall",

@@ -28,6 +28,7 @@
 
 #include "../AudioNode/AudioNode.h"
 #include "../LfpDisplayNode/LfpDisplayNode.h"
+#include "../RTNFDisplayNode/RTNFDisplayNode.h"
 #include "../SpikeDisplayNode/SpikeDisplayNode.h"
 #include "../EventNode/EventNode.h"
 #include "../EventBroadcaster/EventBroadcaster.h"
@@ -650,6 +651,12 @@ GenericProcessor* ProcessorGraph::createProcessorFromDescription(String& descrip
         {
             std::cout << "Creating an LfpDisplayNode." << std::endl;
             processor = new LfpDisplayNode();
+        }
+
+        else if (subProcessorType.equalsIgnoreCase("RTNF Viewer"))
+        {
+            std::cout << "Creating a RTNFDisplayNode." << std::endl;
+            processor = new RTNFDisplayNode();
         }
 
         else if (subProcessorType.equalsIgnoreCase("Spike Viewer"))

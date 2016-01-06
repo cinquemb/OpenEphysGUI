@@ -68,7 +68,7 @@ LfpDisplayCanvas::LfpDisplayCanvas(LfpDisplayNode* processor_) :
     addAndMakeVisible(timescale);
 
     //Ranges for neural data
-     voltageRanges[HEADSTAGE_CHANNEL].add("25");
+    voltageRanges[HEADSTAGE_CHANNEL].add("25");
     voltageRanges[HEADSTAGE_CHANNEL].add("50");
     voltageRanges[HEADSTAGE_CHANNEL].add("100");
     voltageRanges[HEADSTAGE_CHANNEL].add("250");
@@ -123,7 +123,7 @@ LfpDisplayCanvas::LfpDisplayCanvas(LfpDisplayNode* processor_) :
     typeButtons.add(tbut);
 
     //Ranges for ADC data
-     voltageRanges[ADC_CHANNEL].add("0.01");
+    voltageRanges[ADC_CHANNEL].add("0.01");
     voltageRanges[ADC_CHANNEL].add("0.05");
     voltageRanges[ADC_CHANNEL].add("0.1");
     voltageRanges[ADC_CHANNEL].add("0.5");

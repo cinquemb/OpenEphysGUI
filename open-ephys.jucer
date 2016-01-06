@@ -295,6 +295,20 @@
               file="Source/Audio/AudioComponent.h"/>
       </GROUP>
       <GROUP id="yQmqZWk" name="Processors">
+        <GROUP id="{DA378349-D12C-5AA8-E5AD-CAEDA41011C5}" name="RTNFDisplayNode">
+          <FILE id="xdqxo5" name="RTNFDisplayNode.cpp" compile="1" resource="0"
+                file="Source/Processors/RTNFDisplayNode/RTNFDisplayNode.cpp"/>
+          <FILE id="hWZHll" name="RTNFDisplayNode.h" compile="0" resource="0"
+                file="Source/Processors/RTNFDisplayNode/RTNFDisplayNode.h"/>
+          <FILE id="qp01zI" name="RTNFDisplayEditor.cpp" compile="1" resource="0"
+                file="Source/Processors/RTNFDisplayNode/RTNFDisplayEditor.cpp"/>
+          <FILE id="CR54F8" name="RTNFDisplayEditor.h" compile="0" resource="0"
+                file="Source/Processors/RTNFDisplayNode/RTNFDisplayEditor.h"/>
+          <FILE id="rCQ0w2" name="RTNFDisplayCanvas.cpp" compile="1" resource="0"
+                file="Source/Processors/RTNFDisplayNode/RTNFDisplayCanvas.cpp"/>
+          <FILE id="BV6l8Z" name="RTNFDisplayCanvas.h" compile="0" resource="0"
+                file="Source/Processors/RTNFDisplayNode/RTNFDisplayCanvas.h"/>
+        </GROUP>
         <GROUP id="{6E059BEC-4A8F-BCDA-1F91-9B22C6CBF2E4}" name="Rectifier">
           <FILE id="oMFsRh" name="Rectifier.cpp" compile="1" resource="0" file="Source/Processors/Rectifier/Rectifier.cpp"/>
           <FILE id="NdIO5Q" name="Rectifier.h" compile="0" resource="0" file="Source/Processors/Rectifier/Rectifier.h"/>
