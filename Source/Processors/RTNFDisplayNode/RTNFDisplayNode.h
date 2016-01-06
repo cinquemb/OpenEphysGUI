@@ -31,6 +31,8 @@
 
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include "../GenericProcessor/GenericProcessor.h"
+#include "RTNFDisplayEditor.h"
+#include "../Editors/VisualizerEditor.h"
 
 /**
 
@@ -53,6 +55,8 @@ public:
 
     /** The class destructor, used to deallocate memory */
     ~RTNFDisplayNode();
+
+    AudioProcessorEditor* createEditor();
 
     /** Determines whether the processor is treated as a source. */
     bool isSource()

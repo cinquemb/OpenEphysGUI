@@ -37,6 +37,14 @@ RTNFDisplayNode::~RTNFDisplayNode()
 
 }
 
+AudioProcessorEditor* RTNFDisplayNode::createEditor()
+{
+
+    editor = new RTNFDisplayEditor(this, true);
+    return editor;
+
+}
+
 
 
 void RTNFDisplayNode::setParameter(int parameterIndex, float newValue)
