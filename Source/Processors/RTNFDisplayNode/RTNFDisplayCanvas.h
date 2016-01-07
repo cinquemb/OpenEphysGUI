@@ -327,12 +327,12 @@ private:
     RTNFDisplayCanvas* canvas;
 };
 
-class RTNFTimer : public Timer
+class RTNFTimer : public HighResolutionTimer
 {
     public:
-        RTNFTimer(RTNFDisplayCanvas*);
+        RTNFTimer(RTNFDisplayCanvas* canvas);
         ~RTNFTimer();
-        void timerCallback();
+        void hiResTimerCallback();
 
         void incrementTimerCount();
         void resetTimerCount();

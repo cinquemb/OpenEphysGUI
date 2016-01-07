@@ -31,9 +31,11 @@ RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(pr
     timescale = new RTNFTimescale(this);
 
 
-    float timerInterval = (float)(1000/processor->screen_update_factor);
+    int timerInterval = (int)(1000/processor->screen_update_factor);
 
     timescale->setTimebase(timebase);
+
+    
 
     viewport->setViewedComponent(rtnfDisplay, false);
     viewport->setScrollBarsShown(true, false);
@@ -640,7 +642,7 @@ double RTNFTimer::getBaselineSTDV(){return baselineSTDV;}
 bool RTNFTimer::getIsBaseline(){return isBaseLine;}
 int RTNFTimer::getMaxBaseLineLength(){return max_baseline_length;}
 
-void RTNFTimer::timerCallback(){
+void RTNFTimer::hiResTimerCallback(){
     std::cout << "here" << std::endl;
     canvas->updateFeedbackVectors();
     incrementTimerCount();
