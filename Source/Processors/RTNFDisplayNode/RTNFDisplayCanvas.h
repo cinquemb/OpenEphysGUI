@@ -31,7 +31,6 @@
 class RTNFDisplayNode;
 
 class RTNFTimescale;
-class RTNFDisplay;
 class RTNFDisplayInfo;
 class RTNFEventDisplayInterface;
 class RTNFViewport;
@@ -135,7 +134,7 @@ class RTNFDisplayCanvas : public Visualizer,
         MidiBuffer* eventBuffer;
 
         ScopedPointer<RTNFTimescale> timescale;
-        ScopedPointer<RTNFDisplay> rtnfDisplay;
+        //ScopedPointer<RTNFDisplay> rtnfDisplay;
         ScopedPointer<RTNFViewport> viewport;
         ScopedPointer<RTNFTimer> rtnfTimer;
 
@@ -172,6 +171,9 @@ class RTNFDisplayCanvas : public Visualizer,
 
         int scrollBarThickness;
 
+        Font font;
+        StringArray labels;
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RTNFDisplayCanvas);
 };
 
@@ -194,126 +196,6 @@ private:
     Font font;
 
     StringArray labels;
-
-};
-
-class RTNFDisplay : public Component
-{
-public:
-    RTNFDisplay(RTNFDisplayCanvas*, Viewport*);
-    ~RTNFDisplay();
-
-    void setNumChannels(int numChannels);
-    int getNumChannels();
-
-    int getTotalHeight();
-
-    void paint(Graphics& g);
-
-    void refresh();
-
-    void resized();
-
-    void mouseDown(const MouseEvent& event);
-    void mouseWheelMove(const MouseEvent&  event, const MouseWheelDetails&   wheel) ;
-
-
-    void setRange(float range, ChannelType type);
-    
-    //Withouth parameters returns selected type
-    int getRange();
-    int getRange(ChannelType type);
-
-    void setChannelHeight(int r, bool resetSingle = true);
-    int getChannelHeight();
-    void setInputInverted(bool);
-    void setDrawMethod(bool);
-
-    void setColors();
-
-    bool setEventDisplayState(int ch, bool state);
-    bool getEventDisplayState(int ch);
-
-    int getColorGrouping();
-    void setColorGrouping(int i);
-
-    void setEnabledState(bool, int);
-    bool getEnabledState(int);
-    void enableChannel(bool, int);
-
-    bool getSingleChannelState();
-
-    Array<Colour> channelColours;
-
-    Array<RTNFDisplay*> channels;
-    Array<RTNFDisplay*> channelInfo;
-
-    bool eventDisplayEnabled[8];
-    bool isPaused; // simple pause function, skips screen bufer updates
-
-private:
-    void toggleSingleChannel(int chan);
-    int singleChan;
-    Array<bool> savedChannelState;
-
-    int numChans;
-
-    int totalHeight;
-
-    int colorGrouping;
-
-    RTNFDisplayCanvas* canvas;
-    Viewport* viewport;
-
-    float range[3];
-
-
-};
-
-class RTNFDisplayInfo : public RTNFDisplay,
-    public Button::Listener
-{
-public:
-    RTNFDisplayInfo(RTNFDisplayCanvas*, RTNFDisplay*);
-
-    void paint(Graphics& g);
-
-    void buttonClicked(Button* button);
-
-    void resized();
-
-    void setEnabledState(bool);
-    void updateType();
-
-private:
-
-    ScopedPointer<UtilityButton> enableButton;
-
-};
-
-class RTNFEventDisplayInterface : public Component,
-    public Button::Listener
-{
-public:
-    RTNFEventDisplayInterface(RTNFDisplay*, RTNFDisplayCanvas*, int chNum);
-    ~RTNFEventDisplayInterface();
-
-    void paint(Graphics& g);
-
-    void buttonClicked(Button* button);
-
-    void checkEnabledState();
-
-    bool isEnabled;
-
-private:
-
-    int channelNumber;
-
-    RTNFDisplay* display;
-    RTNFDisplayCanvas* canvas;
-
-    ScopedPointer<UtilityButton> chButton;
 
 };
 

@@ -27,17 +27,12 @@
 RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(processor_), timebase(1.0f), displayGain(1.0f),   timeOffset(0.0f)
 {
     viewport = new RTNFViewport(this);
-    rtnfDisplay = new RTNFDisplay(this, viewport);
     timescale = new RTNFTimescale(this);
-
 
     int timerInterval = (int)(1000/processor->screen_update_factor);
 
     timescale->setTimebase(timebase);
 
-    
-
-    viewport->setViewedComponent(rtnfDisplay, false);
     viewport->setScrollBarsShown(true, false);
 
     scrollBarThickness = viewport->getScrollBarThickness();
@@ -101,6 +96,24 @@ void RTNFDisplayCanvas::paint(Graphics& g){
     //g.drawText(typeNames[selectedChannelType],110,getHeight()-30,50,20,Justification::centredLeft,false);
 
     //g.drawText("Event disp.",500,getHeight()-55,300,20,Justification::left, false);
+
+    font = Font("Default", 16, Font::plain);
+
+    g.setFont(font);
+
+    g.setColour(Colour(100,100,100));
+
+    g.drawText("ms:",5,0,100,getHeight(),Justification::left, false);
+
+    for (int i = 1; i < 10; i++)
+    {
+        if (i == 5)
+            g.drawLine(getWidth()/10*i,0,getWidth()/10*i,getHeight(),3.0f);
+        else
+            g.drawLine(getWidth()/10*i,0,getWidth()/10*i,getHeight(),1.0f);
+
+        g.drawText(labels[i-1],getWidth()/10*i+3,0,100,getHeight(),Justification::left, false);
+    }
 }
 
 void RTNFDisplayCanvas::updateFeedbackVectors(){
@@ -259,311 +272,6 @@ void RTNFViewport::visibleAreaChanged(const Rectangle<int>& newVisibleArea)
     canvas->refresh();
 }
 
-// Rtnf Display -------------------------------------------
-
-RTNFDisplay::RTNFDisplay(RTNFDisplayCanvas* c, Viewport* v) :
-    singleChan(-1), canvas(c), viewport(v)
-{
-    totalHeight = 0;
-    colorGrouping=1;
-
-    range[0] = 1000;
-    range[1] = 500;
-    range[2] = 500000;
-
-    addMouseListener(this, true);
-
-    //hand-built palette
-    channelColours.add(Colour(224,185,36));
-    channelColours.add(Colour(214,210,182));
-    channelColours.add(Colour(243,119,33));
-    channelColours.add(Colour(186,157,168));
-    channelColours.add(Colour(237,37,36));
-    channelColours.add(Colour(179,122,79));
-    channelColours.add(Colour(217,46,171));
-    channelColours.add(Colour(217, 139,196));
-    channelColours.add(Colour(101,31,255));
-    channelColours.add(Colour(141,111,181));
-    channelColours.add(Colour(48,117,255));
-    channelColours.add(Colour(184,198,224));
-    channelColours.add(Colour(116,227,156));
-    channelColours.add(Colour(150,158,155));
-    channelColours.add(Colour(82,173,0));
-    channelColours.add(Colour(125,99,32));
-
-    isPaused=false;
-
-}
-
-RTNFDisplay::~RTNFDisplay()
-{
-    deleteAllChildren();
-}
-
-int RTNFDisplay::getNumChannels()
-{
-    return numChans;
-}
-
-
-
-int RTNFDisplay::getColorGrouping()
-{
-    return colorGrouping;
-}
-
-void RTNFDisplay::setColorGrouping(int i)
-{
-    colorGrouping=i;
-    setColors(); // so that channel colors get re-assigned
-
-}
-
-
-void RTNFDisplay::setNumChannels(int numChannels)
-{
-    numChans = numChannels;
-
-    deleteAllChildren();
-
-    channels.clear();
-    channelInfo.clear();
-
-    totalHeight = 0;
-
-    setColors();
-
-    //std::cout << "TOTAL HEIGHT = " << totalHeight << std::endl;
-
-    // // this doesn't seem to do anything:
-    //canvas->fullredraw = true;
-    //refresh();
-
-}
-
-void RTNFDisplay::setColors()
-{
-}
-
-
-int RTNFDisplay::getTotalHeight()
-{
-    return totalHeight;
-}
-
-void RTNFDisplay::resized()
-{
-    // no need to resize because only plotting one graph, maybe in future we'll want to plot data streams processed differently
-
-}
-
-void RTNFDisplay::paint(Graphics& g)
-{
-
-}
-
-void RTNFDisplay::refresh()
-{
-
-
-    int topBorder = viewport->getViewPositionY();
-    int bottomBorder = viewport->getViewHeight() + topBorder;
-
-    canvas->fullredraw = false;
-}
-
-void RTNFDisplay::setRange(float r, ChannelType type)
-{
-    range[type] = r;
-    canvas->fullredraw = true; //issue full redraw
-}
-
-int RTNFDisplay::getRange()
-{
-    return getRange(canvas->getSelectedType());
-}
-
-int RTNFDisplay::getRange(ChannelType type)
-{
-    return 0;
-}
-
-
-void RTNFDisplay::setChannelHeight(int r, bool resetSingle)
-{
-
-    for (int i = 0; i < numChans; i++)
-    {
-        channels[i]->setChannelHeight(r);
-        channelInfo[i]->setChannelHeight(r);
-    }
-    if (resetSingle && singleChan != -1)
-    {
-        setSize(getWidth(),numChans*getChannelHeight());
-        viewport->setScrollBarsShown(true,false);
-        viewport->setViewPosition(Point<int>(0,singleChan*r));
-        singleChan = -1;
-    }
-
-    resized();
-
-}
-
-void RTNFDisplay::setInputInverted(bool isInverted)
-{
-
-    for (int i = 0; i < numChans; i++)
-    {
-        channels[i]->setInputInverted(isInverted);
-    }
-
-    resized();
-
-}
-
-void RTNFDisplay::setDrawMethod(bool isDrawMethod)
-{
-    for (int i = 0; i < numChans; i++)
-    {
-        channels[i]->setDrawMethod(isDrawMethod);
-    }
-    resized();
-
-}
-
-
-int RTNFDisplay::getChannelHeight()
-{
-    return 0;
-}
-
-
-
-void RTNFDisplay::mouseWheelMove(const MouseEvent&  e, const MouseWheelDetails&   wheel)
-{
-
-    //std::cout << "Mouse wheel " <<  e.mods.isCommandDown() << "  " << wheel.deltaY << std::endl;
-    //TODO Changing ranges with the wheel is currently broken. With multiple ranges, most
-    //of the wheel range code needs updating
-    if (e.mods.isCommandDown())  // CTRL + scroll wheel -> change channel spacing
-    {
-        int h = getChannelHeight();
-        int hdiff=0;
-        
-        std::cout << wheel.deltaY << std::endl;
-        
-        if (wheel.deltaY > 0)
-        {
-            hdiff = 2;
-        }
-        else
-        {
-            if (h > 5)
-                hdiff = -2;
-        }
-
-        if (abs(h) > 100) // accelerate scrolling for large ranges
-            hdiff *= 3;
-
-        setChannelHeight(h+hdiff);
-        int oldX=viewport->getViewPositionX();
-        int oldY=viewport->getViewPositionY();
-
-        setBounds(0,0,getWidth()-0, getChannelHeight()*canvas->nChans); // update height so that the scrollbar is correct
-
-        int mouseY=e.getMouseDownY(); // should be y pos relative to inner viewport (0,0)
-        int scrollBy = (mouseY/h)*hdiff*2;// compensate for motion of point under current mouse position
-        viewport->setViewPosition(oldX,oldY+scrollBy); // set back to previous position plus offset
-
-        canvas->setSpreadSelection(h+hdiff); // update combobox
-
-    }
-    else
-    {
-        if (e.mods.isShiftDown())  // SHIFT + scroll wheel -> change channel range
-        {
-            int h = getRange();
-            int step = canvas->getRangeStep(canvas->getSelectedType());
-            
-            std::cout << wheel.deltaY << std::endl;
-            
-            if (wheel.deltaY > 0)
-            {
-                setRange(h+step,canvas->getSelectedType());
-            }
-            else
-            {
-                if (h > step+1)
-                    setRange(h-step,canvas->getSelectedType());
-            }
-
-            //canvas->setRangeSelection(h); // update combobox
-
-        }
-        else    // just scroll
-        {
-            //  passes the event up to the viewport so the screen scrolls
-            if (viewport != nullptr && e.eventComponent == this) // passes only if it's not a listening event
-                viewport->mouseWheelMove(e.getEventRelativeTo(canvas), wheel);
-
-        }
-    }
-
-    canvas->fullredraw = true;//issue full redraw
-    refresh();
-
-}
-
-void RTNFDisplay::toggleSingleChannel(int chan)
-{
-    setChannelHeight(canvas->getChannelHeight());
-}
-
-bool RTNFDisplay::getSingleChannelState()
-{
-    if (singleChan < 0) return false;
-    else return true;
-}
-
-
-void RTNFDisplay::mouseDown(const MouseEvent& event)
-{
-    //int y = event.getMouseDownY(); //relative to each channel pos
-    MouseEvent canvasevent = event.getEventRelativeTo(viewport);
-    int y = canvasevent.getMouseDownY() + viewport->getViewPositionY(); // need to account for scrolling
-
-    canvas->fullredraw = true;//issue full redraw
-
-    refresh();
-
-}
-
-
-bool RTNFDisplay::setEventDisplayState(int ch, bool state)
-{
-    eventDisplayEnabled[ch] = state;
-    return eventDisplayEnabled[ch];
-}
-
-
-bool RTNFDisplay::getEventDisplayState(int ch)
-{
-    return eventDisplayEnabled[ch];
-}
-
-void RTNFDisplay::enableChannel(bool state, int chan)
-{
-}
-
-void RTNFDisplay::setEnabledState(bool state, int chan)
-{
-}
-
-bool RTNFDisplay::getEnabledState(int chan)
-{
-    return true;
-}
-
 // Rtnf Timescale -------------------------------------------
 
 
@@ -643,7 +351,6 @@ bool RTNFTimer::getIsBaseline(){return isBaseLine;}
 int RTNFTimer::getMaxBaseLineLength(){return max_baseline_length;}
 
 void RTNFTimer::hiResTimerCallback(){
-    std::cout << "here" << std::endl;
     canvas->updateFeedbackVectors();
     incrementTimerCount();
 }
