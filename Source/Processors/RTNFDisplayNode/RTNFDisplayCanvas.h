@@ -109,6 +109,9 @@ class RTNFDisplayCanvas : public Visualizer,
 
         int nChans;
 
+        bool getIsUpdateGraph();
+        void setIsUpdateGraph(bool status);
+
     private:
         Array<float> sampleRate;
         float timebase;
@@ -134,7 +137,6 @@ class RTNFDisplayCanvas : public Visualizer,
         MidiBuffer* eventBuffer;
 
         ScopedPointer<RTNFTimescale> timescale;
-        //ScopedPointer<RTNFDisplay> rtnfDisplay;
         ScopedPointer<RTNFViewport> viewport;
         ScopedPointer<RTNFTimer> rtnfTimer;
 
@@ -173,6 +175,9 @@ class RTNFDisplayCanvas : public Visualizer,
 
         Font font;
         StringArray labels;
+        bool isUpdateGraph;
+        double offset_;
+        double scale_;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RTNFDisplayCanvas);
 };

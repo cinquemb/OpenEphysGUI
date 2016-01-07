@@ -50,6 +50,13 @@ RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(pr
     rtnfTimer = new RTNFTimer(this);
     rtnfTimer->startTimer(timerInterval);
 
+    offset_ = 0.012;
+    scale_ = 4.0;
+
+    //initalizing turned on indecies
+    for(int i=0;i<128;i++)
+        processor->selected_channel_indecides.push_back(1);
+
 }
 
 RTNFDisplayCanvas::~RTNFDisplayCanvas(){
@@ -114,6 +121,40 @@ void RTNFDisplayCanvas::paint(Graphics& g){
 
         g.drawText(labels[i-1],getWidth()/10*i+3,0,100,getHeight(),Justification::left, false);
     }
+
+    // plotting baseline and feedback vectors if in feedback
+    if(!rtnfTimer->getIsBaseline() && getIsUpdateGraph()){
+        float x1,y1;
+        x1 = getWidth()/10;
+        y1 = getHeight()/2;
+        double dVal = 0.0;
+        double mean_ = rtnfTimer->getBaselineMean();;
+        double stdv_ = rtnfTimer->getBaselineSTDV();
+        double timeCounter_ = 0;
+
+        g.setColour(Colour(128,128,128));
+
+        for(int i = 0; i < baseline_values.size(); ++i){
+
+            dVal = getHeight() * offset_ * ((baseline_values[i] - mean_)/stdv_);
+            g.fillRect( (float)(x1 + timeCounter_*scale_), (float)(y1-dVal), (float)scale_, (float)dVal);
+            timeCounter_++;
+
+            //dVal =   getHeight()*offset_*((baselineData_[i] -mean_[0])/std_[0]);
+            //dVal = truncateDVAL(dVal, Y1, Y1);
+            //dVal *= (inversionFlag_ ?-1.0:1.0);//Inversion taken care of
+            //QRect rect1(X1  + timeCounter_*scale_, Y1- dVal, scale_, dVal);
+        }
+
+        g.setColour(Colour(0,128,0));
+        for(int i = 0; i < feedback_values.size(); ++i){
+            dVal = getHeight() * offset_ * ((feedback_values[i] - mean_)/stdv_);
+            g.fillRect( (float)(x1 + timeCounter_*scale_), (float)(y1-dVal), (float)scale_, (float)dVal);
+            timeCounter_++;
+        } 
+    }
+
+    g.setColour(Colour(100,100,100));
 }
 
 void RTNFDisplayCanvas::updateFeedbackVectors(){
@@ -137,6 +178,7 @@ void RTNFDisplayCanvas::updateFeedbackVectors(){
             baseline_values.push_back(avgPowerOnTurnedOnChannels);
         else{
             if(rtnfTimer->getIsBaseline()){
+                std::cout << "Starting feedback" << std::endl;
                 double tempSum = 0.0;
                 int baseline_length = baseline_values.size();
                 for(auto iterM : baseline_values)
@@ -154,6 +196,13 @@ void RTNFDisplayCanvas::updateFeedbackVectors(){
             feedback_values.push_back(avgPowerOnTurnedOnChannels);
         }
     }
+}
+
+bool RTNFDisplayCanvas::getIsUpdateGraph(){
+    return isUpdateGraph;
+}
+void RTNFDisplayCanvas::setIsUpdateGraph(bool status){
+    isUpdateGraph = status;
 }
 
 
@@ -193,13 +242,8 @@ void RTNFDisplayCanvas::buttonClicked(Button* button){}
 
 void RTNFDisplayCanvas::refresh()
 {
-
-    updateScreenBuffer();
-
-    //RTNFDisplay->refresh(); // redraws only the new part of the screen buffer
-
-    //getPeer()->performAnyPendingRepaintsNow();
-
+    std::cout << "updating screen" << std::endl;
+    repaint();
 }
 
 bool RTNFDisplayCanvas::keyPressed(const KeyPress& key)
@@ -351,6 +395,9 @@ bool RTNFTimer::getIsBaseline(){return isBaseLine;}
 int RTNFTimer::getMaxBaseLineLength(){return max_baseline_length;}
 
 void RTNFTimer::hiResTimerCallback(){
-    canvas->updateFeedbackVectors();
+    canvas->setIsUpdateGraph(true);
+    canvas->updateFeedbackVectors();    
+    canvas->refresh();
+    canvas->setIsUpdateGraph(false);
     incrementTimerCount();
 }
