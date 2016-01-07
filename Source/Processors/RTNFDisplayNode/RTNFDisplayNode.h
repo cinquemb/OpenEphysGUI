@@ -93,6 +93,7 @@ public:
     int total_channels = -1;
     int current_samples = 0;
     int screen_update_factor = 1;
+    std::vector<int> selected_channel_indecides;
     
 
 private:

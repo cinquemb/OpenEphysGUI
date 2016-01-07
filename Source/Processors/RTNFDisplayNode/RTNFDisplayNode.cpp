@@ -81,10 +81,10 @@ void RTNFDisplayNode::process(AudioSampleBuffer& dataBuffer,
             tempChanSumPower += sample_value*sample_value;
         }
         //store power for each channel power
-        current_channel_power[chan_id] = tempChanSumPower/screen_update_factor;
+        current_channel_power[chan_id] = tempChanSumPower;
         
         sumPower += tempChanSumPower;
     }
-    globalPower = sumPower/(total_channels*screen_update_factor);
+    globalPower = sumPower/total_channels;
 }
 

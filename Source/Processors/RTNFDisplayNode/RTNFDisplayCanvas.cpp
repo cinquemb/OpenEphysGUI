@@ -23,13 +23,15 @@
 
 
 #include "RTNFDisplayCanvas.h"
-#include "RTNFDisplayCanvas.h"
 
 RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(processor_), timebase(1.0f), displayGain(1.0f),   timeOffset(0.0f)
 {
     viewport = new RTNFViewport(this);
     rtnfDisplay = new RTNFDisplay(this, viewport);
     timescale = new RTNFTimescale(this);
+
+
+    float timerInterval = (float)(1000/processor->screen_update_factor);
 
     timescale->setTimebase(timebase);
 
@@ -48,11 +50,13 @@ RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(pr
     timebaseSelection->addListener(this);
     addAndMakeVisible(timebaseSelection);
 
-    processor->globalPower;
-    processor->current_channel_power;
+    rtnfTimer = new RTNFTimer(this);
+    rtnfTimer->startTimer(timerInterval);
+
 }
 
-RTNFDisplayCanvas::~RTNFDisplayCanvas(){}
+RTNFDisplayCanvas::~RTNFDisplayCanvas(){
+}
 
 void RTNFDisplayCanvas::paint(Graphics& g){
     //std::cout << "Painting" << std::endl;
@@ -87,15 +91,56 @@ void RTNFDisplayCanvas::paint(Graphics& g){
 
     g.setColour(Colour(100,100,100));
 
-    g.drawText("Voltage range ("+ rangeUnits[selectedChannelType] +")",5,getHeight()-55,300,20,Justification::left, false);
-    g.drawText("Timebase (s)",175,getHeight()-55,300,20,Justification::left, false);
-    g.drawText("Spread (px)",345,getHeight()-55,300,20,Justification::left, false);
-    g.drawText("Color grouping",620,getHeight()-55,300,20,Justification::left, false);
+    //g.drawText("Voltage range ("+ rangeUnits[selectedChannelType] +")",5,getHeight()-55,300,20,Justification::left, false);
+    g.drawText("Time (s)",175,getHeight()-55,300,20,Justification::left, false);
+    //g.drawText("Spread (px)",345,getHeight()-55,300,20,Justification::left, false);
+    //g.drawText("Color grouping",620,getHeight()-55,300,20,Justification::left, false);
 
     //g.drawText(typeNames[selectedChannelType],110,getHeight()-30,50,20,Justification::centredLeft,false);
 
-    g.drawText("Event disp.",500,getHeight()-55,300,20,Justification::left, false);
+    //g.drawText("Event disp.",500,getHeight()-55,300,20,Justification::left, false);
 }
+
+void RTNFDisplayCanvas::updateFeedbackVectors(){
+    //processor->globalPower;
+
+    std::cout << "updateFeedbackVectors is being called" << std::endl;
+
+    //pull power samples from turned on channels and pushback onto appropriate vector
+    double tempPowerIndexSum = 0.0;
+    int turnedOnChannels = 0;
+    for(int i =0; i< processor->current_channel_power.size(); ++i){
+        if(processor->selected_channel_indecides[i] == 1){
+            turnedOnChannels++;
+            tempPowerIndexSum += processor->current_channel_power[i]/processor->screen_update_factor;
+        }
+    }
+
+    if(turnedOnChannels > 0){
+        double avgPowerOnTurnedOnChannels = tempPowerIndexSum/turnedOnChannels;
+        if(rtnfTimer->getTimerCount() < rtnfTimer->getMaxBaseLineLength())
+            baseline_values.push_back(avgPowerOnTurnedOnChannels);
+        else{
+            if(rtnfTimer->getIsBaseline()){
+                double tempSum = 0.0;
+                int baseline_length = baseline_values.size();
+                for(auto iterM : baseline_values)
+                    tempSum += iterM;
+                rtnfTimer->setBaselineMean(tempSum/baseline_length);
+                
+                tempSum = 0.0;
+                double baseline_mean = rtnfTimer->getBaselineMean();
+                for(auto iterS: baseline_values)
+                    tempSum += std::pow((iterS - baseline_mean), 2);
+
+                rtnfTimer->setBaselineSTDV(std::sqrt(tempSum/(baseline_length-1)));
+                rtnfTimer->setIsBaseline(false);
+            }
+            feedback_values.push_back(avgPowerOnTurnedOnChannels);
+        }
+    }
+}
+
 
 void RTNFDisplayCanvas::resized(){
 
@@ -160,10 +205,6 @@ bool RTNFDisplayCanvas::keyPressed(const KeyPress& key, Component* orig)
         return keyPressed(key);
     }
     return false;
-}
-
-void RTNFDisplayCanvas::updateFeedback(){
-
 }
 
 int RTNFDisplayCanvas::getRangeStep(ChannelType type)
@@ -569,4 +610,38 @@ void RTNFTimescale::setTimebase(float t)
 
     repaint();
 
+}
+
+RTNFTimer::RTNFTimer(RTNFDisplayCanvas* c){
+    resetTimerCount();
+    setBaselineMean(0.0);
+    setBaselineSTDV(0.0);
+    setIsBaseline(true);
+    setMaxBaseLineLength(30);
+    this->canvas = c;
+}
+
+RTNFTimer::~RTNFTimer(){
+    stopTimer();
+}
+
+void RTNFTimer::incrementTimerCount(){++timerCount;}
+void RTNFTimer::resetTimerCount(){timerCount = 0;}
+int RTNFTimer::getTimerCount(){return timerCount;}
+
+void RTNFTimer::setBaselineMean(double mean){baselineMean = mean;}
+void RTNFTimer::setBaselineSTDV(double stdv){baselineSTDV = stdv;}
+void RTNFTimer::setIsBaseline(bool _isBaseLine){isBaseLine = _isBaseLine;}
+void RTNFTimer::setMaxBaseLineLength(int isBaseLine){max_baseline_length = isBaseLine;}
+
+
+double RTNFTimer::getBaselineMean(){return baselineMean;}
+double RTNFTimer::getBaselineSTDV(){return baselineSTDV;}
+bool RTNFTimer::getIsBaseline(){return isBaseLine;}
+int RTNFTimer::getMaxBaseLineLength(){return max_baseline_length;}
+
+void RTNFTimer::timerCallback(){
+    std::cout << "here" << std::endl;
+    canvas->updateFeedbackVectors();
+    incrementTimerCount();
 }

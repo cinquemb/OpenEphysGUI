@@ -35,6 +35,7 @@ class RTNFDisplay;
 class RTNFDisplayInfo;
 class RTNFEventDisplayInterface;
 class RTNFViewport;
+class RTNFTimer;
 
 class RTNFDisplayCanvas : public Visualizer,
     public ComboBox::Listener,
@@ -45,7 +46,7 @@ class RTNFDisplayCanvas : public Visualizer,
         RTNFDisplayCanvas(RTNFDisplayNode* processor_);
         ~RTNFDisplayCanvas();
 
-        void updateFeedback();
+        void updateFeedbackVectors();
         
         std::vector<double> baseline_values;
         std::vector<double> feedback_values;
@@ -136,6 +137,7 @@ class RTNFDisplayCanvas : public Visualizer,
         ScopedPointer<RTNFTimescale> timescale;
         ScopedPointer<RTNFDisplay> rtnfDisplay;
         ScopedPointer<RTNFViewport> viewport;
+        ScopedPointer<RTNFTimer> rtnfTimer;
 
         ScopedPointer<ComboBox> timebaseSelection;
         ScopedPointer<ComboBox> rangeSelection;
@@ -323,6 +325,38 @@ public:
 
 private:
     RTNFDisplayCanvas* canvas;
+};
+
+class RTNFTimer : public Timer
+{
+    public:
+        RTNFTimer(RTNFDisplayCanvas*);
+        ~RTNFTimer();
+        void timerCallback();
+
+        void incrementTimerCount();
+        void resetTimerCount();
+        int getTimerCount();
+
+        void setBaselineMean(double mean);
+        void setBaselineSTDV(double stdv);
+        void setIsBaseline(bool _isBaseLine);
+        void setMaxBaseLineLength(int isBaseLine);
+
+
+        double getBaselineMean();
+        double getBaselineSTDV();
+        bool getIsBaseline();
+        int getMaxBaseLineLength();
+
+
+    private:
+        RTNFDisplayCanvas* canvas;
+        int timerCount;
+        double baselineMean;
+        double baselineSTDV;
+        bool isBaseLine;
+        int max_baseline_length;
 };
 
 #endif  // RTNFDISPLAYCANVAS_H_INCLUDED
