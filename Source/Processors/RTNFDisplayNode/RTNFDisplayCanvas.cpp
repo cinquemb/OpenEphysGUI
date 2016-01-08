@@ -123,7 +123,9 @@ void RTNFDisplayCanvas::paint(Graphics& g){
     }
 
     // plotting baseline and feedback vectors if in feedback
+    std::cout << "before graph plotting" << std::endl;
     if(!rtnfTimer->getIsBaseline() && getIsUpdateGraph()){
+        std::cout << "in graph plotting" << std::endl;
         float x1,y1;
         x1 = getWidth()/10;
         y1 = getHeight()/2;
