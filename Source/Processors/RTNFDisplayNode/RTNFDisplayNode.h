@@ -92,7 +92,7 @@ public:
     std::vector<double> current_channel_power;
     int total_channels = -1;
     int current_samples = 0;
-    int screen_update_factor = 1;
+    int screen_update_factor = 2;
     std::vector<int> selected_channel_indecides;
     
 

@@ -50,7 +50,7 @@ RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(pr
     rtnfTimer = new RTNFTimer(this);
     rtnfTimer->startTimer(timerInterval);
 
-    offset_ = 0.05;
+    offset_ = 0.5;
     scale_ = 4.0;
 
     //initalizing turned on indecies
@@ -124,7 +124,6 @@ void RTNFDisplayCanvas::paint(Graphics& g){
 
     // plotting baseline and feedback vectors if in feedback
     if(!rtnfTimer->getIsBaseline()){
-        std::cout << "in graph plotting" << std::endl;
         float x1,y1;
         x1 = getWidth()/10;
         y1 = getHeight()/2;
@@ -402,6 +401,7 @@ bool RTNFTimer::getIsBaseline(){return isBaseLine;}
 int RTNFTimer::getMaxBaseLineLength(){return max_baseline_length;}
 
 void RTNFTimer::hiResTimerCallback(){
+    std::cout << "Count: " << timerCount << std::endl;
     canvas->updateFeedbackVectors();    
     canvas->refresh();
     incrementTimerCount();
