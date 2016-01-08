@@ -111,6 +111,7 @@ class RTNFDisplayCanvas : public Visualizer,
 
         bool getIsUpdateGraph();
         void setIsUpdateGraph(bool status);
+        double truncateDVAL(double& dVal_, float& y1_, float& y2_);
 
     private:
         Array<float> sampleRate;

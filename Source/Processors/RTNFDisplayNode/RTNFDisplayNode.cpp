@@ -50,13 +50,6 @@ AudioProcessorEditor* RTNFDisplayNode::createEditor()
 void RTNFDisplayNode::setParameter(int parameterIndex, float newValue)
 {
     editor->updateParameterButtons(parameterIndex);
-
-    //Parameter& p =  parameters.getReference(parameterIndex);
-    //p.setValue(newValue, 0);
-
-    //threshold = newValue;
-
-    //std::cout << float(p[0]) << std::endl;
     editor->updateParameterButtons(parameterIndex);
 }
 
