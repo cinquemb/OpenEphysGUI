@@ -51,7 +51,7 @@ RTNFDisplayCanvas::RTNFDisplayCanvas(RTNFDisplayNode* processor_) : processor(pr
     rtnfTimer->startTimer(timerInterval);
 
     offset_ = 0.5;
-    scale_ = 4.0;
+    scale_ = 1.0;
 
     //initalizing turned on indecies
     for(int i=0;i<128;i++)
