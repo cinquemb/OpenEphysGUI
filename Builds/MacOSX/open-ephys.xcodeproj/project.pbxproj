@@ -4110,6 +4110,8 @@
 					/usr/local/lib/hdf5/libhdf5.dylib,
 					/usr/local/lib/hdf5/libhdf5_cpp.dylib,
 					/usr/local/lib/libzmq.dylib,
+					/usr/local/lib/libarmadillo.dylib,
+					/usr/local/lib/libjsoncpp.a,
 				);
 				SDKROOT_ppc = macosx10.5;
 			};
@@ -4156,6 +4158,8 @@
 					/usr/local/lib/hdf5/libhdf5.dylib,
 					/usr/local/lib/hdf5/libhdf5_cpp.dylib,
 					/usr/local/lib/libzmq.dylib,
+					/usr/local/lib/libarmadillo.dylib,
+					/usr/local/lib/libjsoncpp.a,
 				);
 				SDKROOT_ppc = macosx10.5;
 			};

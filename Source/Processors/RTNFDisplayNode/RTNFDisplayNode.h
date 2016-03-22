@@ -34,6 +34,14 @@
 #include "RTNFDisplayEditor.h"
 #include "../Editors/VisualizerEditor.h"
 
+
+/* this library is being used for efficient matrix ops for spacial filtering */
+#include <armadillo>
+
+/* this library is being used to read in the weight files and the filter matrix file */
+#include <json/json.h>
+#include <json/reader.h>
+
 /**
 
   This class serves as a template for creating new processors.
