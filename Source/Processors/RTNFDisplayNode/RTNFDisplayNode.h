@@ -96,12 +96,15 @@ public:
         this method while data acquisition is active. If they are modified in any
         other way, the application will crash.  */
     void setParameter(int parameterIndex, float newValue);
+    double roiPower = 0.0;
     double globalPower = 0.0;
     std::vector<double> current_channel_power;
     int total_channels = -1;
     int current_samples = 0;
     int screen_update_factor = 2;
+    int max_samples_per_buffer = 5000; //FIX: number of columns in data matrix, dependant on sampling rate
     std::vector<int> selected_channel_indecides;
+    arma::mat spacial_filter_matrix;
     
 
 private:
